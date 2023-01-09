@@ -1,0 +1,51 @@
+# Ignore the .tsx? files
+**/*.ts
+**/*.tsx
+
+# Revert the .d.ts files
+!**/*.d.ts
+
+# NPM
+.npm
+.nvmrc
+node_modules
+npm-shrinkwrap.json
+
+
+# CI + GIT
+.ci
+.git
+.gitignore
+.gitlab-ci.yml
+
+# AW cache
+.awcache
+
+# Lint
+.editorconfig
+.eslintrc
+.prettierrc.js
+tslint.*
+
+# IDE
+.idea
+.vscode
+
+# Jest & Tests
+jest.config.js
+/jest
+coverage
+.jest
+.test
+.coverage
+__snapshots__
+*.test.tsx
+*.test.ts
+*.test.js
+*.test.js.map
+*.test.d.ts
+*.tests.tsx
+*.tests.ts
+*.tests.js
+*.tests.js.map
+*.tests.d.ts
