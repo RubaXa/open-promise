@@ -1,12 +1,16 @@
 {
-  "name": "open-promise",
+  "name": "o-promise",
   "version": "1.0.0",
   "description": "Open Promise — Micro tool for creating Promise like Deferred",
-  "main": "index.js",
+  "homepage": "https://github.com/RubaXa/open-promise",
+  "main": "./index.js",
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "release": "npm_config_registry=https://registry.npmjs.com npm publish",
+    "prepublishOnly": "tsc"
   },
   "keywords": [
+    "open",
     "promise",
     "util",
     "defer",

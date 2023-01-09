@@ -1,9 +1,9 @@
-OpenPromise 👐
---------------
+Open Promise 👐
+---------------
 Micro tool for creating Promise like Deferred
 
 ```sh
-npm i --save open-promise
+npm i --save o-promise
 ```
 
 ---
@@ -11,7 +11,7 @@ npm i --save open-promise
 ### Usage
 
 ```js
-import {createOpenPromise} from 'open-promise';
+import {createOpenPromise} from 'o-promise';
 
 // 1. Tuple
 const [promise, resolve, reject] = createOpenPromise<string>();
