@@ -2,6 +2,10 @@
   "name": "o-promise",
   "version": "1.0.0",
   "description": "Open Promise — Micro tool for creating Promise like Deferred",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:RubaXa/open-promise.git"
+  },
   "homepage": "https://github.com/RubaXa/open-promise",
   "main": "./index.js",
   "scripts": {
