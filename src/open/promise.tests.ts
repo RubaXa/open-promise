@@ -47,6 +47,7 @@ describe('api', () => {
 		expect(typeof open.resolve).toBe('function')
 		expect(typeof open.reject).toBe('function');
 		
+		expect(open.state).toBe('pending');
 		expect(open.promise).toBe(open[0]);
 		expect(open.resolve).toBe(open[1]);
 		expect(open.reject).toBe(open[2]);
@@ -60,6 +61,7 @@ describe('api', () => {
 		open.reject('qux');
 
 		await expect(open.promise).resolves.toBe('foo');
+		expect(open.state).toBe('fulfilled');
 	});
 
 	it('reject', async () => {
@@ -70,6 +72,7 @@ describe('api', () => {
 		open.resolve('foo');
 
 		await expect(open.promise).rejects.toBe('qux');
+		expect(open.state).toBe('rejected');
 	});
 
 	describe('executer', () => {
@@ -106,9 +109,12 @@ describe('api', () => {
 		});
 
 		it('resolve before executer', async () => {
-			const open = createOpenPromise(() => 'fail');
+			const executer = jest.fn(() => 'fail');
+			const open = createOpenPromise(executer);
+			
 			open.resolve('ok');
 			await expect(open.promise).resolves.toBe('ok');
+			expect(executer.mock.calls.length).toBe(0);
 		});
 	});
 });

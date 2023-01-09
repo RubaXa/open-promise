@@ -1,6 +1,6 @@
 Open Promise 👐
 ---------------
-Micro tool for creating Promise like Deferred
+Micro tool for creating Promise likes Deferred.
 
 ```sh
 npm i --save o-promise
@@ -19,9 +19,24 @@ const [promise, resolve, reject] = createOpenPromise<string>();
 // 2. Deferred
 const {promise, resolve, reject} = createOpenPromise<number>();
 
-// 3. With executer
-const open = createOpenPromise<boolean>((resolve, reject) => {
+// 3. With executer + return
+const open = createOpenPromise(() => {
+	return '...';
+});
+open.reject('aborted'); // `executer` — won't be called
+
+// 4. With executer + promise
+const open = createOpenPromise(() => {
+	// for example
+	return fetch('...');
+});
+
+// 5. With executer + resolvers
+const open = createOpenPromise((resolve, reject) => {
 	// Your Logic
 });
-open.reject('aborted');
 ```
+
+---
+
+### 100% covergae ;]
