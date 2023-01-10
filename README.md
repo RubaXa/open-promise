@@ -1,6 +1,6 @@
 Open Promise 👐
 ---------------
-Micro tool for creating Promise likes Deferred (with AbortController support).
+Micro tool for creating [OpenPromise](./src/open/promise.ts#L3-L15) likes Deferred (with AbortController support).
 
 ```sh
 npm i --save o-promise
