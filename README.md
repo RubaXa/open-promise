@@ -23,7 +23,10 @@ const {promise, resolve, reject} = createOpenPromise<number>();
 const open = createOpenPromise(() => {
 	return '...';
 });
+
+open.state; // pending
 open.reject('aborted'); // `executer` — won't be called
+open.state; // rejected
 
 // 4. With executer + promise
 const open = createOpenPromise(() => {
