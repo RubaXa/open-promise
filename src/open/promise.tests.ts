@@ -40,7 +40,7 @@ describe('types', () => {
 });
 
 describe('api', () => {
-	it('promise', () => {
+	it('object', () => {
 		const open = createOpenPromise();
 		
 		expect(open.promise).toBeInstanceOf(Promise);
@@ -51,6 +51,18 @@ describe('api', () => {
 		expect(open.promise).toBe(open[0]);
 		expect(open.resolve).toBe(open[1]);
 		expect(open.reject).toBe(open[2]);
+
+		expect(open.abortController).toBeInstanceOf(AbortController);
+		expect(open.abortController).toBe(open[3]);
+	});
+
+	it('spred', () => {
+		const [promise, resolve, reject, controller] = createOpenPromise();
+		
+		expect(promise).toBeInstanceOf(Promise);
+		expect(typeof resolve).toBe('function')
+		expect(typeof reject).toBe('function');
+		expect(controller).toBeInstanceOf(AbortController);
 	});
 
 	it('resolve', async () => {
@@ -115,6 +127,28 @@ describe('api', () => {
 			open.resolve('ok');
 			await expect(open.promise).resolves.toBe('ok');
 			expect(executer.mock.calls.length).toBe(0);
+		});
+
+		it('AbortController', async () => {
+			const handleAbort = jest.fn();
+			const executer = jest.fn((resolve, _, controller: AbortController) => {
+				controller.signal.onabort = handleAbort;
+				setTimeout(resolve, 10);
+			});
+			const open = createOpenPromise(executer);
+
+			// Before tick
+			expect(open.abortController.signal.aborted).toBe(false);
+
+			// Next tick
+			await Promise.resolve();
+			expect(executer.mock.calls.length).toBe(1);
+
+			// Abort
+			open.reject('aborted');
+			await expect(open.promise).rejects.toBe('aborted');
+			expect(handleAbort.mock.calls.length).toBe(1);
+			expect(open.abortController.signal.aborted).toBe(true);
 		});
 	});
 });

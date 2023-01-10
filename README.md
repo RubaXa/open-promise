@@ -25,7 +25,7 @@ const open = createOpenPromise(() => {
 });
 
 open.state; // pending
-open.reject('aborted'); // `executer` — won't be called
+open.reject('canceled'); // `executer` — won't be called
 open.state; // rejected
 
 // 4. With executer + promise
@@ -38,6 +38,26 @@ const open = createOpenPromise(() => {
 const open = createOpenPromise((resolve, reject) => {
 	// Your Logic
 });
+```
+
+---
+
+### Support AbortController
+
+#### Open "fetch"
+
+```js
+import {createOpenPromise} from 'o-promise';
+
+const openFetch = createOpenPromise((_, _, abortController) => {
+	return fetch('...', {signal: abortController.signal});
+});
+
+// Reject
+openFetch.reject('aborted');
+
+// Or `AbortController#abort`
+openFetch.abortController.abort();
 ```
 
 ---
