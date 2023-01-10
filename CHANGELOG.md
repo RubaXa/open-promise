@@ -5,6 +5,7 @@
 ### v1.2.0
 
 - Support `AbortController`
+- Removing Array-methods from `OpenPromise` type
 - Fixed `executer` result resolver
 
 ---

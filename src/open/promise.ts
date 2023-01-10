@@ -1,17 +1,17 @@
 const STATE_PENDING = 'pending';
 
 /** OpenPromise Object */
-export type OpenPromise<T> = [
+export type OpenPromise<T> = Omit<[
     Promise<T>,
     (value: T) => void,
     (reason: unknown) => void,
     AbortController,
-] & {
+], Extract<keyof Array<unknown>, string>> & {
     state: 'pending' | 'fulfilled' | 'rejected';
     promise: Promise<T>;
     resolve: (value: T) => void;
     reject: (reason: unknown) => void;
-    abortController: AbortController;
+    controller: AbortController;
 };
 
 /** Create OpenPromise */
@@ -26,14 +26,23 @@ export const createOpenPromise = <T>(
     const open = Array(4) as unknown as OpenPromise<Awaited<T>>;
 
     // Lazy AbortController (to not care about of polyfill)
-    let abortController: AbortController | undefined;
-    const abortControllerProp = {
-        get: () => abortController || (abortController = new AbortController()),
+    let controller: AbortController | undefined;
+    const controllerProp = {
+        get: () => {
+            if (!controller) {
+                controller = new AbortController();
+                controller.signal.addEventListener('abort', () => {
+                    open.reject(controller!.signal.reason);
+                });
+            }
+
+            return controller;
+        },
     };
 
     Object.defineProperties(open, {
-        3: abortControllerProp,
-        abortController: abortControllerProp,
+        3: controllerProp,
+        controller: controllerProp,
     });
 
     // Initial State
@@ -51,7 +60,7 @@ export const createOpenPromise = <T>(
             if (open.state !== STATE_PENDING) return;
             open.state = 'rejected';
             originalReject(reason);
-            abortController?.abort();
+            controller?.abort(reason);
         };
 
         if (executer) {
@@ -62,7 +71,7 @@ export const createOpenPromise = <T>(
                     const result = executer(
                         resolve,
                         reject,
-                        executer.length > 2 ? abortControllerProp.get() : null as any,
+                        executer.length > 2 ? controllerProp.get() : null as any,
                     ) as Awaited<T>;
 
                     if (result && typeof result === 'object' && 'then' in result) {

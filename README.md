@@ -1,6 +1,6 @@
 Open Promise 👐
 ---------------
-Micro tool for creating Promise likes Deferred.
+Micro tool for creating Promise likes Deferred (with AbortController support).
 
 ```sh
 npm i --save o-promise
@@ -49,15 +49,15 @@ const open = createOpenPromise((resolve, reject) => {
 ```js
 import {createOpenPromise} from 'o-promise';
 
-const openFetch = createOpenPromise((_, _, abortController) => {
-	return fetch('...', {signal: abortController.signal});
+const openFetch = createOpenPromise((_, __, controller) => {
+	return fetch('...', {signal: controller.signal});
 });
 
 // Reject
-openFetch.reject('aborted');
+openFetch.reject('cacneled');
 
 // Or `AbortController#abort`
-openFetch.abortController.abort();
+openFetch.controller.abort('canceled');
 ```
 
 ---

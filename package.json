@@ -1,7 +1,7 @@
 {
   "name": "o-promise",
-  "version": "1.1.0",
-  "description": "Open Promise — Micro tool for creating Promise likes Deferred",
+  "version": "1.2.0",
+  "description": "Open Promise 👐 — Micro tool for creating Promise likes Deferred (with AbortController support).",
   "repository": {
     "type": "git",
     "url": "git@github.com:RubaXa/open-promise.git"
@@ -10,7 +10,7 @@
   "main": "./index.js",
   "scripts": {
     "test": "jest --coverage",
-    "release": "npm_config_registry=https://registry.npmjs.com npm publish",
+    "release": "npm test && npm_config_registry=https://registry.npmjs.com npm publish",
     "prepublishOnly": "tsc"
   },
   "keywords": [
@@ -18,7 +18,10 @@
     "promise",
     "util",
     "defer",
-    "deferred"
+    "deferred",
+    "fetch",
+    "abort",
+    "controller"
   ],
   "author": "Lebedev Konstantin <ibn@rubaxa.org>",
   "license": "MIT",

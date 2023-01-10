@@ -2,6 +2,12 @@ import {expectTypeOf} from 'expect-type';
 import { createOpenPromise } from './promise';
 
 describe('types', () => {
+	it('omit array methods', () => {
+		const open = createOpenPromise();
+		
+		expectTypeOf(open).not.toHaveProperty('slice');
+	});
+
 	it('unknown', () => {
 		const unk = createOpenPromise();
 		
@@ -52,8 +58,8 @@ describe('api', () => {
 		expect(open.resolve).toBe(open[1]);
 		expect(open.reject).toBe(open[2]);
 
-		expect(open.abortController).toBeInstanceOf(AbortController);
-		expect(open.abortController).toBe(open[3]);
+		expect(open.controller).toBeInstanceOf(AbortController);
+		expect(open.controller).toBe(open[3]);
 	});
 
 	it('spred', () => {
@@ -129,26 +135,40 @@ describe('api', () => {
 			expect(executer.mock.calls.length).toBe(0);
 		});
 
-		it('AbortController', async () => {
-			const handleAbort = jest.fn();
-			const executer = jest.fn((resolve, _, controller: AbortController) => {
-				controller.signal.onabort = handleAbort;
-				setTimeout(resolve, 10);
+		describe('AbortController', () => {
+			it('reject', async () => {
+				const handleAbort = jest.fn();
+				const executer = jest.fn((resolve, _, controller: AbortController) => {
+					controller.signal.onabort = handleAbort;
+					setTimeout(resolve, 10);
+				});
+				const open = createOpenPromise(executer);
+
+				// Before tick
+				expect(open.controller.signal.aborted).toBe(false);
+
+				// Next tick
+				await Promise.resolve();
+				expect(executer.mock.calls.length).toBe(1);
+
+				// Abort
+				open.reject('aborted');
+				await expect(open.promise).rejects.toBe('aborted');
+				expect(handleAbort.mock.calls.length).toBe(1);
+				expect(open.controller.signal.aborted).toBe(true);
+				expect(open.controller.signal.reason).toBe('aborted');
 			});
-			const open = createOpenPromise(executer);
+			
+			it('abort', async () => {
+				const executer = jest.fn();
+				const open = createOpenPromise(executer);
 
-			// Before tick
-			expect(open.abortController.signal.aborted).toBe(false);
-
-			// Next tick
-			await Promise.resolve();
-			expect(executer.mock.calls.length).toBe(1);
-
-			// Abort
-			open.reject('aborted');
-			await expect(open.promise).rejects.toBe('aborted');
-			expect(handleAbort.mock.calls.length).toBe(1);
-			expect(open.abortController.signal.aborted).toBe(true);
+				// Abort
+				open.controller.abort('!');
+				await expect(open.promise).rejects.toBe('!');
+				expect(open.controller.signal.reason).toBe('!');
+				expect(open.controller.signal.aborted).toBe(true);
+			});
 		});
 	});
 });
