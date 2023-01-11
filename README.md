@@ -62,4 +62,4 @@ openFetch.controller.abort('canceled');
 
 ---
 
-### 100% covergae ;]
+### 100% code & types covergae ;]
