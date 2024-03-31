@@ -2,6 +2,13 @@
 -------------------------------
 <a name="start"></a>
 
+### v1.3.0
+
+- Canceled removing Array-methods from `OpenPromise` type for modern TS
+- Add `readonly` in `OpenPromise`
+
+---
+
 ### v1.2.0
 
 - Support `AbortController`
