@@ -4,10 +4,10 @@ type NotReadonly<T> = {-readonly [P in keyof T]: T[P]};
 
 /** OpenPromise Object */
 export type OpenPromise<T> = readonly [
-    Promise<T>,
-    (value: T) => void,
-    (reason: unknown) => void,
-    AbortController,
+    promise: Promise<T>,
+    resolve: (value: T) => void,
+    reject: (reason: unknown) => void,
+    controller: AbortController,
 ] & {
     readonly state: 'pending' | 'fulfilled' | 'rejected';
     readonly promise: Promise<T>;
