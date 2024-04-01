@@ -1,6 +1,6 @@
 {
   "name": "o-promise",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Open Promise 👐 — Micro tool for creating Promise likes Deferred (with AbortController support).",
   "repository": {
     "type": "git",
