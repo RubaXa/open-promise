@@ -1,17 +1,19 @@
 const STATE_PENDING = 'pending';
 
+type NotReadonly<T> = {-readonly [P in keyof T]: T[P]};
+
 /** OpenPromise Object */
-export type OpenPromise<T> = Omit<[
-    Promise<T>,
-    (value: T) => void,
-    (reason: unknown) => void,
-    AbortController,
-], Extract<keyof Array<unknown>, string>> & {
-    state: 'pending' | 'fulfilled' | 'rejected';
-    promise: Promise<T>;
-    resolve: (value: T) => void;
-    reject: (reason: unknown) => void;
-    controller: AbortController;
+export type OpenPromise<T> = readonly [
+    promise: Promise<T>,
+    resolve: (value: T) => void,
+    reject: (reason: unknown) => void,
+    controller: AbortController,
+] & {
+    readonly state: 'pending' | 'fulfilled' | 'rejected';
+    readonly promise: Promise<T>;
+    readonly resolve: (value: T) => void;
+    readonly reject: (reason: unknown) => void;
+    readonly controller: AbortController;
 };
 
 /** Create OpenPromise */
@@ -23,7 +25,7 @@ export const createOpenPromise = <T>(
     ) => T,
 ): OpenPromise<Awaited<T>> => {
     // Create OpenTuple
-    const open = Array(4) as unknown as OpenPromise<Awaited<T>>;
+    const open = Array(4) as unknown as NotReadonly<OpenPromise<Awaited<T>>>;
 
     // Lazy AbortController (to not care about of polyfill)
     let controller: AbortController | undefined;
