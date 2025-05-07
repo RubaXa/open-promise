@@ -5,13 +5,13 @@ type NotReadonly<T> = {-readonly [P in keyof T]: T[P]};
 /** OpenPromise Object */
 export type OpenPromise<T> = readonly [
     promise: Promise<T>,
-    resolve: (value: T) => void,
+    resolve: (value: T | Promise<T>) => void,
     reject: (reason: unknown) => void,
     controller: AbortController,
 ] & {
     readonly state: 'pending' | 'fulfilled' | 'rejected';
     readonly promise: Promise<T>;
-    readonly resolve: (value: T) => void;
+    readonly resolve: (value: T | Promise<T>) => void;
     readonly reject: (reason: unknown) => void;
     readonly controller: AbortController;
 };
@@ -49,7 +49,7 @@ export const createOpenPromise = <T>(
 
     // Initial State
     open.state = STATE_PENDING;
-    
+
     // Create promise
     open[0] = open.promise = new Promise((originalResolve, originalReject) => {
         const resolve = open[1] = open.resolve = (value) => {
