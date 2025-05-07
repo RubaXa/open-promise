@@ -1,17 +1,19 @@
 import {expectTypeOf} from 'expect-type';
 import { createOpenPromise } from './promise';
 
+type PromiseOrValue<T> = T | Promise<T>;
+
 describe('types', () => {
 	xit('omit array methods', () => {
 		const open = createOpenPromise();
-	
+
 		// @ts-expect-error может в будущем там можно будет
 		expectTypeOf(open).not.toHaveProperty('slice');
 	});
 
 	it('unknown', () => {
 		const unk = createOpenPromise();
-		
+
 		// @ts-expect-error
 		expectTypeOf(unk.resolve).parameter(0).toBeString();
 		expectTypeOf(unk.resolve).parameter(0).toBeUnknown();
@@ -20,13 +22,13 @@ describe('types', () => {
 		expectTypeOf(unk.resolve).toEqualTypeOf(unk[1]);
 		expectTypeOf(unk.reject).toEqualTypeOf(unk[2]);
 	});
-	
+
 	it('generic', () => {
 		const str = createOpenPromise<string>();
-		
+
 		// @ts-expect-error
 		expectTypeOf(str.resolve).parameter(0).toBeUnknown();
-		expectTypeOf(str.resolve).parameter(0).toBeString();
+		expectTypeOf(str.resolve).parameter(0).toEqualTypeOf<PromiseOrValue<string>>();
 
 		expectTypeOf(str.promise).toEqualTypeOf(str[0]);
 		expectTypeOf(str.resolve).toEqualTypeOf(str[1]);
@@ -36,12 +38,12 @@ describe('types', () => {
 	describe('auto', () => {
 		it('primitive', () => {
 			const open = createOpenPromise(() => 123);
-			expectTypeOf(open.resolve).parameter(0).toBeNumber();
+			expectTypeOf(open.resolve).parameter(0).toEqualTypeOf<PromiseOrValue<number>>();
 		});
-		
+
 		it('promise', () => {
 			const open = createOpenPromise(() => Promise.resolve(true));
-			expectTypeOf(open.resolve).parameter(0).toBeBoolean();
+			expectTypeOf(open.resolve).parameter(0).toEqualTypeOf<PromiseOrValue<boolean>>();
 		});
 	});
 });
@@ -49,11 +51,11 @@ describe('types', () => {
 describe('api', () => {
 	it('object', () => {
 		const open = createOpenPromise();
-		
+
 		expect(open.promise).toBeInstanceOf(Promise);
 		expect(typeof open.resolve).toBe('function')
 		expect(typeof open.reject).toBe('function');
-		
+
 		expect(open.state).toBe('pending');
 		expect(open.promise).toBe(open[0]);
 		expect(open.resolve).toBe(open[1]);
@@ -65,7 +67,7 @@ describe('api', () => {
 
 	it('spred', () => {
 		const [promise, resolve, reject, controller] = createOpenPromise();
-		
+
 		expect(promise).toBeInstanceOf(Promise);
 		expect(typeof resolve).toBe('function')
 		expect(typeof reject).toBe('function');
@@ -74,7 +76,7 @@ describe('api', () => {
 
 	it('resolve', async () => {
 		const open = createOpenPromise<string>();
-		
+
 		open.resolve('foo');
 		open.resolve('bar');
 		open.reject('qux');
@@ -83,9 +85,27 @@ describe('api', () => {
 		expect(open.state).toBe('fulfilled');
 	});
 
+	it('resolve with Promise', async () => {
+		const open = createOpenPromise<string>();
+
+		open.resolve(Promise.resolve('foo'));
+
+		await expect(open.promise).resolves.toBe('foo');
+		expect(open.state).toBe('fulfilled');
+	});
+
+	it('resolve with rejected Promise', async () => {
+		const open = createOpenPromise<string>();
+
+		open.resolve(Promise.reject('foo'));
+
+		await expect(open.promise).rejects.toBe('foo');
+		expect(open.state).toBe('fulfilled');
+	});
+
 	it('reject', async () => {
 		const open = createOpenPromise<string>();
-		
+
 		open.reject('qux');
 		open.reject('bar');
 		open.resolve('foo');
@@ -121,7 +141,7 @@ describe('api', () => {
 			const open = createOpenPromise((resolve) => resolve(1));
 			await expect(open.promise).resolves.toBe(1);
 		});
-		
+
 		it('inner reject', async () => {
 			const open = createOpenPromise((_, reject) => reject(1));
 			await expect(open.promise).rejects.toBe(1);
@@ -130,7 +150,7 @@ describe('api', () => {
 		it('resolve before executer', async () => {
 			const executer = jest.fn(() => 'fail');
 			const open = createOpenPromise(executer);
-			
+
 			open.resolve('ok');
 			await expect(open.promise).resolves.toBe('ok');
 			expect(executer.mock.calls.length).toBe(0);
@@ -159,7 +179,7 @@ describe('api', () => {
 				expect(open.controller.signal.aborted).toBe(true);
 				expect(open.controller.signal.reason).toBe('aborted');
 			});
-			
+
 			it('abort', async () => {
 				const executer = jest.fn();
 				const open = createOpenPromise(executer);
