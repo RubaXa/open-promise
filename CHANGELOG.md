@@ -2,6 +2,12 @@
 -------------------------------
 <a name="start"></a>
 
+### v1.3.1
+
+- Fixed types to allow resolving with a `Promise` value
+
+---
+
 ### v1.3.0
 
 - Canceled removing Array-methods from `OpenPromise` type for modern TS
