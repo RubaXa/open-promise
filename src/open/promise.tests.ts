@@ -181,12 +181,62 @@ describe('api', () => {
 			});
 
 			it('abort', async () => {
-				const executer = jest.fn();
-				const open = createOpenPromise(executer);
-
-				// Abort
+				const open = createOpenPromise();
 				open.controller.abort('!');
+
 				await expect(open.promise).rejects.toBe('!');
+				expect(open.controller.signal.reason).toBe('!');
+				expect(open.controller.signal.aborted).toBe(true);
+			});
+		});
+		
+		describe('Dependent AbortController', () => {
+			it('abort before creation', async () => {
+				const ctrl = new AbortController();
+				
+				ctrl.abort('!');
+				const open = createOpenPromise(ctrl);
+
+				await expect(open.promise).rejects.toBe('!');
+				expect(open.controller).toBe(ctrl);
+				expect(open.controller.signal.reason).toBe('!');
+				expect(open.controller.signal.aborted).toBe(true);
+			});
+
+			it('abort after creation', async () => {
+				const ctrl = new AbortController();
+				
+				const open = createOpenPromise(ctrl);
+				ctrl.abort('!');
+
+				await expect(open.promise).rejects.toBe('!');
+				expect(open.controller).toBe(ctrl);
+				expect(open.controller.signal.reason).toBe('!');
+				expect(open.controller.signal.aborted).toBe(true);
+			});
+		});
+		
+		describe('Dependent AbortSignal', () => {
+			it('abort before creation', async () => {
+				const ctrl = new AbortController();
+
+				ctrl.abort('!');
+				const open = createOpenPromise(ctrl.signal);
+
+				await expect(open.promise).rejects.toBe('!');
+				expect(open.controller).not.toBe(ctrl);
+				expect(open.controller.signal.reason).toBe('!');
+				expect(open.controller.signal.aborted).toBe(true);
+			});
+
+			it('abort after creation', async () => {
+				const ctrl = new AbortController();
+
+				const open = createOpenPromise(ctrl.signal);
+				ctrl.abort('!');
+
+				await expect(open.promise).rejects.toBe('!');
+				expect(open.controller).not.toBe(ctrl);
 				expect(open.controller.signal.reason).toBe('!');
 				expect(open.controller.signal.aborted).toBe(true);
 			});

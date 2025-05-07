@@ -2,8 +2,9 @@
 -------------------------------
 <a name="start"></a>
 
-### v1.3.1
+### v1.4.0
 
+- Support creation OpenPromise with `AbortController` or `AbortSignal`
 - Fixed types to allow resolving with a `Promise` value
 
 ---
